@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\DrawLine.cs" />
+    <Compile Include="Assets\ExampleClass.cs" />
     <Compile Include="Assets\FarseerUnity\Base\FSCollisionGroup.cs" />
     <Compile Include="Assets\FarseerUnity\Base\FSEnums.cs" />
     <Compile Include="Assets\FarseerUnity\Base\FSJointComponent.cs" />
@@ -195,6 +196,8 @@
     <Compile Include="Assets\FarseerUnity\FSWorldComponent.cs" />
     <Compile Include="Assets\FarseerUnity\Support Files\Test_iOS\TestII.cs" />
     <Compile Include="Assets\FarseerUnity\Support Files\Tutorials [PDF]\Tutorials\Part 4\CollisionEventsDone\TestCollisionEventsDoneCp.cs" />
+    <Compile Include="Assets\TestTriangulation.cs" />
+    <Compile Include="Assets\Triangulation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\FarseerUnity\Base\FarseerDebugViewUnity\FDView.shader" />

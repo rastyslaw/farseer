@@ -181,7 +181,7 @@ namespace FarseerPhysics.Common.PolygonManipulation
                         firstFixture.Rotation = fixtures[i].Body.Rotation;
                         firstFixture.LinearVelocity = fixtures[i].Body.LinearVelocity;
                         firstFixture.AngularVelocity = fixtures[i].Body.AngularVelocity;
-                        firstFixture.BodyType = BodyType.Dynamic;
+                        firstFixture.BodyType = BodyType.Dynamic; 
                     }
 
                     if (SanityCheck(second))
@@ -198,7 +198,7 @@ namespace FarseerPhysics.Common.PolygonManipulation
             }
         }
 
-        private static bool SanityCheck(Vertices vertices)
+        public static bool SanityCheck(Vertices vertices)
         {
             if (vertices.Count < 3)
                 return false;

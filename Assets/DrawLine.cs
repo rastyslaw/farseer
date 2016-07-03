@@ -22,18 +22,10 @@ public class DrawLine : MonoBehaviour
     void Start()
     {
         CreateLine();
-        World world = FSWorldComponent.PhysicsWorld;
-        world.BodyRemoved += BodyRemoved;
-
         point1.SetActive(false);
         point2.SetActive(false);
     }
-
-    private void BodyRemoved(Body body)
-    {
-        Debug.Log(body); 
-    }
-
+    
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
@@ -62,7 +54,7 @@ public class DrawLine : MonoBehaviour
             point1.SetActive(false);
             point2.SetActive(false);
             
-            CuttingTools.Cut(
+            TestTriangulation.Cut(
                 FSWorldComponent.PhysicsWorld, 
                 new FVector2(startMousePos.x, startMousePos.y), 
                 new FVector2(mousePos.x, mousePos.y), 
