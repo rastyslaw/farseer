@@ -18,9 +18,12 @@ public class DrawLine : MonoBehaviour
     private GameObject point1;
     [SerializeField]
     private GameObject point2;
-   
+
+    private TestTriangulation test;
+
     void Start()
     {
+        test = gameObject.GetComponent<TestTriangulation>(); 
         CreateLine();
         point1.SetActive(false);
         point2.SetActive(false);
@@ -53,12 +56,11 @@ public class DrawLine : MonoBehaviour
             line.gameObject.SetActive(false);
             point1.SetActive(false);
             point2.SetActive(false);
-            
-            TestTriangulation.Cut(
+
+            test.Cut( 
                 FSWorldComponent.PhysicsWorld, 
                 new FVector2(startMousePos.x, startMousePos.y), 
-                new FVector2(mousePos.x, mousePos.y), 
-                0.1f);
+                new FVector2(mousePos.x, mousePos.y));
         }
     }
 

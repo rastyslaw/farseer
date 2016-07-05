@@ -11,10 +11,11 @@ using Microsoft.Xna.Framework;
 public class TestTriangulation : MonoBehaviour {
 
     public GameObject cube;
+    private World world;
 
 	void Start ()
 	{
-        //World world = FSWorldComponent.PhysicsWorld;
+        world = FSWorldComponent.PhysicsWorld;
         //world.BodyRemoved += BodyRemoved;
         
 	    MeshRenderer meshRenderer = cube.GetComponent<MeshRenderer>();
@@ -46,7 +47,7 @@ public class TestTriangulation : MonoBehaviour {
         Destroy(meshRenderer.gameObject);
     }
 
-    public static void DeleteBody(Body body)
+    private void DeleteBody(Body body)
     {
         World world = FSWorldComponent.PhysicsWorld;
         world.RemoveBody(body);
@@ -56,7 +57,7 @@ public class TestTriangulation : MonoBehaviour {
         Destroy(meshRenderer.gameObject);
     }
 
-    public static void Cut(World world, FVector2 start, FVector2 end, float thickness)
+    public void Cut(World world, FVector2 start, FVector2 end, float thickness = 0)
     {
         List<Fixture> fixtures = new List<Fixture>();
         List<FVector2> entryPoints = new List<FVector2>();
@@ -91,59 +92,59 @@ public class TestTriangulation : MonoBehaviour {
                 Vertices first;
                 Vertices second;
                 CuttingTools.SplitShape(fixtures[i], entryPoints[i], exitPoints[i], thickness, out first, out second);
-
-                MeshRenderer meshRenderer = (MeshRenderer)fixtures[i].Body.UserData; 
-
+                
                 if (CuttingTools.SanityCheck(first)) 
                 {
-                    Body firstFixture = BodyFactory.CreatePolygon(world, first, fixtures[i].Shape.Density,
-                                                                        fixtures[i].Body.Position);
-                    firstFixture.Rotation = fixtures[i].Body.Rotation;
-                    firstFixture.LinearVelocity = fixtures[i].Body.LinearVelocity;
-                    firstFixture.AngularVelocity = fixtures[i].Body.AngularVelocity;
-                    firstFixture.BodyType = BodyType.Dynamic;
-
-                    GameObject firstGameObject = new GameObject("firstGameObject");
-                    MeshRenderer firstMeshRenderer = firstGameObject.AddComponent<MeshRenderer>();
-                    firstMeshRenderer.material = new Material(meshRenderer.material);
-
-                    firstFixture.UserData = firstMeshRenderer; 
-
-                    List<Vector2> points = new List<Vector2>();
-                    foreach (var p in first)
-                    {
-                        points.Add(new Vector2(p.X, p.Y));
-                    }
-
-                    Vector3[] verticles; 
-                    int[] triangles;
-                    Vector2[] uvcoords;
-
-                    Triangulation.GetResult(points, false, Vector3.back, out verticles, out triangles, out uvcoords);
-                    
-                    MeshFilter meshFilter = firstGameObject.AddComponent<MeshFilter>();
-                    Mesh mesh = meshFilter.mesh;
-                    mesh.Clear();
-                    mesh.vertices = verticles;
-                    mesh.uv = uvcoords;
-                    mesh.triangles = triangles;
-
-                    FVector2 oldPosition = fixtures[i].Body.Position;
-                    firstGameObject.transform.position = new Vector3(oldPosition.X, oldPosition.Y);
-                    firstGameObject.transform.rotation = Quaternion.Euler(new Vector3(0, 0, fixtures[i].Body.Rotation * 180 / Mathf.PI));
-                }
+                    CreateNewObject(fixtures[i], first);  
+                } 
 
                 if (CuttingTools.SanityCheck(second))
                 {
-                    Body secondFixture = BodyFactory.CreatePolygon(world, second, fixtures[i].Shape.Density,
-                                                                         fixtures[i].Body.Position);
-                    secondFixture.Rotation = fixtures[i].Body.Rotation;
-                    secondFixture.LinearVelocity = fixtures[i].Body.LinearVelocity;
-                    secondFixture.AngularVelocity = fixtures[i].Body.AngularVelocity;
-                    secondFixture.BodyType = BodyType.Dynamic;
+                    CreateNewObject(fixtures[i], second);
                 }
                 DeleteBody(fixtures[i].Body);
             }
         }
+    }
+
+    private void CreateNewObject(Fixture fixture, Vertices vertices)
+    {
+        Body firstFixture = BodyFactory.CreatePolygon(world, vertices, fixture.Shape.Density,
+                                                                        fixture.Body.Position);
+        firstFixture.Rotation = fixture.Body.Rotation;
+        firstFixture.LinearVelocity = fixture.Body.LinearVelocity;
+        firstFixture.AngularVelocity = fixture.Body.AngularVelocity;
+        firstFixture.BodyType = BodyType.Dynamic;
+
+        MeshRenderer meshRenderer = (MeshRenderer)fixture.Body.UserData; 
+
+        GameObject firstGameObject = new GameObject("cuttingObject");
+        MeshRenderer firstMeshRenderer = firstGameObject.AddComponent<MeshRenderer>();
+        firstMeshRenderer.material = new Material(meshRenderer.material);
+
+        firstFixture.UserData = firstMeshRenderer;
+
+        List<Vector2> points = new List<Vector2>();
+        foreach (var p in vertices)
+        {
+            points.Add(new Vector2(p.X, p.Y));
+        }
+
+        Vector3[] verticles;
+        int[] triangles;
+        Vector2[] uvcoords;
+
+        Triangulation.GetResult(points, false, Vector3.back, out verticles, out triangles, out uvcoords);
+
+        MeshFilter meshFilter = firstGameObject.AddComponent<MeshFilter>();
+        Mesh mesh = meshFilter.mesh;
+        mesh.Clear();
+        mesh.vertices = verticles; 
+        mesh.uv = uvcoords;
+        mesh.triangles = triangles;
+
+        FVector2 oldPosition = fixture.Body.Position;
+        firstGameObject.transform.position = new Vector3(oldPosition.X, oldPosition.Y);
+        firstGameObject.transform.rotation = Quaternion.Euler(new Vector3(0, 0, fixture.Body.Rotation * 180 / Mathf.PI));
     }
 }
